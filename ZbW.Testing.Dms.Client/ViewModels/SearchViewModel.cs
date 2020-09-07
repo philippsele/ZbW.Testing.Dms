@@ -1,4 +1,8 @@
-﻿namespace ZbW.Testing.Dms.Client.ViewModels
+﻿using System;
+using System.Windows;
+using ZbW.Testing.Dms.Client.Services;
+
+namespace ZbW.Testing.Dms.Client.ViewModels
 {
     using System.Collections.Generic;
 
@@ -20,13 +24,20 @@
 
         private List<string> _typItems;
 
-        public SearchViewModel()
+        private readonly DocumentManagementService _documentManagementService;
+
+        private readonly IMessageBoxService _messegaBoxService;
+
+        public SearchViewModel(DocumentManagementService documentManagementService, IMessageBoxService messegaBoxService)
         {
             TypItems = ComboBoxItems.Typ;
 
             CmdSuchen = new DelegateCommand(OnCmdSuchen);
             CmdReset = new DelegateCommand(OnCmdReset);
             CmdOeffnen = new DelegateCommand(OnCmdOeffnen, OnCanCmdOeffnen);
+
+            _messegaBoxService = messegaBoxService;
+            _documentManagementService = documentManagementService;
         }
 
         public DelegateCommand CmdOeffnen { get; }
@@ -110,17 +121,28 @@
 
         private void OnCmdOeffnen()
         {
-            // TODO: Add your Code here
+            _documentManagementService.OpenDocument(SelectedMetadataItem.DokumentenGuid, SelectedMetadataItem.ValutaDatum.Year, SelectedMetadataItem.FileName);
         }
 
         private void OnCmdSuchen()
         {
-            // TODO: Add your Code here
+            if (string.IsNullOrEmpty(_suchbegriff) && string.IsNullOrEmpty(_selectedTypItem))
+            {
+                _messegaBoxService.Show("Bitte einen Filter setzen.");
+
+            }
+            else
+            {
+                FilteredMetadataItems = _documentManagementService.SearchDocument(_suchbegriff, _selectedTypItem);
+            }
         }
 
         private void OnCmdReset()
         {
-            // TODO: Add your Code here
+            Suchbegriff = null;
+            SelectedTypItem = null;
+
+            FilteredMetadataItems = null;
         }
     }
 }

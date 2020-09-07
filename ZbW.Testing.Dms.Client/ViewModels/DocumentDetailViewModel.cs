@@ -1,4 +1,9 @@
-﻿namespace ZbW.Testing.Dms.Client.ViewModels
+﻿using System.IO;
+using System.Windows;
+using ZbW.Testing.Dms.Client.Model;
+using ZbW.Testing.Dms.Client.Services;
+
+namespace ZbW.Testing.Dms.Client.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +15,7 @@
 
     using ZbW.Testing.Dms.Client.Repositories;
 
-    internal class DocumentDetailViewModel : BindableBase
+    public class DocumentDetailViewModel : BindableBase
     {
         private readonly Action _navigateBack;
 
@@ -32,7 +37,10 @@
 
         private DateTime? _valutaDatum;
 
-        public DocumentDetailViewModel(string benutzer, Action navigateBack)
+        private readonly DocumentManagementService _documentManagementService;
+        private readonly IMessageBoxService _messegaBoxService;
+
+        public DocumentDetailViewModel(string benutzer, Action navigateBack, DocumentManagementService documentManagementService, IMessageBoxService messageBoxService)
         {
             _navigateBack = navigateBack;
             Benutzer = benutzer;
@@ -41,6 +49,9 @@
 
             CmdDurchsuchen = new DelegateCommand(OnCmdDurchsuchen);
             CmdSpeichern = new DelegateCommand(OnCmdSpeichern);
+
+            _messegaBoxService = messageBoxService;
+            _documentManagementService = documentManagementService;
         }
 
         public string Stichwoerter
@@ -151,7 +162,7 @@
             }
         }
 
-        private void OnCmdDurchsuchen()
+        public void OnCmdDurchsuchen()
         {
             var openFileDialog = new OpenFileDialog();
             var result = openFileDialog.ShowDialog();
@@ -162,11 +173,27 @@
             }
         }
 
-        private void OnCmdSpeichern()
+        public void OnCmdSpeichern()
         {
-            // TODO: Add your Code here
+            if (!HasRequiredFields())
+                return;
+
+            if (!_documentManagementService.AddNewDocument(_benutzer, _bezeichnung, _erfassungsdatum, _filePath, _selectedTypItem, _stichwoerter, Convert.ToDateTime(_valutaDatum), _isRemoveFileEnabled))
+                return;
 
             _navigateBack();
+            
+        }
+
+        public bool HasRequiredFields()
+        {
+            if (string.IsNullOrEmpty(_bezeichnung) || string.IsNullOrEmpty(_valutaDatum.ToString()) || string.IsNullOrEmpty(_selectedTypItem))
+            {
+                _messegaBoxService.Show("Es müssen alle Pflichtfelder ausgefüllt werden!");
+                return false;
+            }
+
+            return true;
         }
     }
 }

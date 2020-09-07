@@ -72,6 +72,17 @@
     </ApplicationDefinition>
     <Compile Include="Model\MetadataItem.cs" />
     <Compile Include="Repositories\ComboBoxItems.cs" />
+    <Compile Include="Services\DocumentManagementService.cs" />
+    <Compile Include="Services\ExportService.cs" />
+    <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\IExportService.cs" />
+    <Compile Include="Services\IFileService.cs" />
+    <Compile Include="Services\IImportService.cs" />
+    <Compile Include="Services\IMessageBoxService.cs" />
+    <Compile Include="Services\ImportService.cs" />
+    <Compile Include="Services\ISearchService.cs" />
+    <Compile Include="Services\MessageBoxService.cs" />
+    <Compile Include="Services\SearchService.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\DocumentDetailViewModel.cs" />
@@ -145,8 +156,6 @@
   <ItemGroup>
     <Resource Include="Images\magnifying_glass.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

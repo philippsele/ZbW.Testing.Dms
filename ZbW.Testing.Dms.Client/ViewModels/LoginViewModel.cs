@@ -1,4 +1,8 @@
-﻿namespace ZbW.Testing.Dms.Client.ViewModels
+﻿using System.Collections.Generic;
+using ZbW.Testing.Dms.Client.Model;
+using ZbW.Testing.Dms.Client.Services;
+
+namespace ZbW.Testing.Dms.Client.ViewModels
 {
     using System.Windows;
 
@@ -13,11 +17,23 @@
 
         private string _benutzername;
 
-        public LoginViewModel(LoginView loginView)
+        private readonly DocumentManagementService _documentManagementService;
+        private readonly IMessageBoxService _messegaBoxService;
+
+        public LoginViewModel(LoginView loginView, IMessageBoxService messageBoxService)
         {
             _loginView = loginView;
             CmdLogin = new DelegateCommand(OnCmdLogin, OnCanLogin);
             CmdAbbrechen = new DelegateCommand(OnCmdAbbrechen);
+            _messegaBoxService = messageBoxService;
+            
+            List<MetadataItem> list = new List<MetadataItem>();
+            IImportService importService = new ImportService();
+            IExportService exportService = new ExportService();
+            IFileService fileService = new FileService(_messegaBoxService);
+            ISearchService searchService = new SearchService();
+            _documentManagementService = new DocumentManagementService(list, messageBoxService, importService, exportService, fileService, searchService);
+            _documentManagementService.RepositoryExists();
         }
 
         public DelegateCommand CmdAbbrechen { get; }
@@ -54,14 +70,18 @@
         {
             if (string.IsNullOrEmpty(Benutzername))
             {
-                MessageBox.Show("Bitte tragen Sie einen Benutzernamen ein...");
+                _messegaBoxService.Show("Bitte tragen Sie einen Benutzernamen ein...");
                 return;
             }
 
-            var searchView = new MainView(Benutzername);
-            searchView.Show();
+            if (_documentManagementService.RepositoryExists())
+            {
+                _documentManagementService.ImportArchiv();
+                var searchView = new MainView(Benutzername, _documentManagementService, _messegaBoxService);
+                searchView.Show();
 
-            _loginView.Close();
+                _loginView.Close();
+            }
         }
     }
 }

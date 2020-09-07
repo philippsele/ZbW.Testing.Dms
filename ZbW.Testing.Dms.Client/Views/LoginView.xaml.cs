@@ -1,4 +1,6 @@
-﻿namespace ZbW.Testing.Dms.Client.Views
+﻿using ZbW.Testing.Dms.Client.Services;
+
+namespace ZbW.Testing.Dms.Client.Views
 {
     using System.Windows;
 
@@ -12,7 +14,8 @@
         public LoginView()
         {
             InitializeComponent();
-            DataContext = new LoginViewModel(this);
+            IMessageBoxService messageBoxService = new MessageBoxService();
+            DataContext = new LoginViewModel(this, messageBoxService);
         }
     }
 }

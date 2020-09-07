@@ -1,4 +1,6 @@
-﻿namespace ZbW.Testing.Dms.Client.ViewModels
+﻿using ZbW.Testing.Dms.Client.Services;
+
+namespace ZbW.Testing.Dms.Client.ViewModels
 {
     using System.Windows.Controls;
 
@@ -13,11 +15,18 @@
 
         private UserControl _content;
 
-        public MainViewModel(string benutzername)
+        private readonly DocumentManagementService _documentManagementService;
+
+        private readonly IMessageBoxService _messegaBoxService;
+
+
+        public MainViewModel(string benutzername, DocumentManagementService documentManagementService, IMessageBoxService messegaBoxService)
         {
             Benutzer = benutzername;
             CmdNavigateToSearch = new DelegateCommand(OnCmdNavigateToSearch);
             CmdNavigateToDocumentDetail = new DelegateCommand(OnCmdNavigateToDocumentDetail);
+            _documentManagementService = documentManagementService;
+            _messegaBoxService = messegaBoxService;
         }
 
         public string Benutzer
@@ -57,12 +66,12 @@
 
         private void OnCmdNavigateToDocumentDetail()
         {
-            Content = new DocumentDetailView(Benutzer, NavigateToSearch);
+            Content = new DocumentDetailView(Benutzer, NavigateToSearch, _documentManagementService, _messegaBoxService);
         }
 
         private void NavigateToSearch()
         {
-            Content = new SearchView();
+            Content = new SearchView(_documentManagementService, _messegaBoxService);
         }
     }
 }
